@@ -43,11 +43,20 @@ type UpdateInput struct {
 	Status      taskdomain.Status
 }
 
+///
+
+type UpdatePereodicInput struct {
+	Title       string
+	Description string
+	// обновляем ток описание + заголовок
+	//Status      taskdomain.Status
+}
+
 type CreatePereodicInput struct {
 	Title       string
 	Description string
 	Status      taskdomain.Status
-	//
+	//	дополнено
 	Repetition int
 	RecurrType taskdomain.Recurr
 	DayAmount  int
