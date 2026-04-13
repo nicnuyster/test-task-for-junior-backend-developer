@@ -216,6 +216,59 @@ func NextPereodicOcurrence(dates time.Time, damnt int, swcase taskdomain.Recurr)
 	}
 }
 
+func (s *Service) DeletePereodic(ctx context.Context, input DeletePereodicInput) error {
+	if input.ID <= 0 {
+		return fmt.Errorf("%w: id must be positive", ErrInvalidInput)
+	}
+
+	return s.repo.DeletePereodic(ctx, input.ID)
+}
+
+func (s *Service) UpdatePereodic(ctx context.Context, input UpdatePereodicInput) (*taskdomain.Task, error) {
+	if input.ID <= 0 {
+		return nil, fmt.Errorf("%w: id must be positive", ErrInvalidInput)
+	}
+
+	normalized, err := validateUpdatePereodicInput(input)
+	if err != nil {
+		return nil, err
+	}
+
+	model := &taskdomain.Task{
+		ID:          input.ID,
+		Title:       normalized.Title,
+		Description: normalized.Description,
+		Status:      normalized.Status,
+		UpdatedAt:   s.now(),
+	}
+
+	updated, err := s.repo.UpdatePereodic(ctx, model)
+	if err != nil {
+		return nil, err
+	}
+
+	return updated, nil
+}
+
+func validateUpdatePereodicInput(input UpdatePereodicInput) (UpdatePereodicInput, error) {
+	input.Title = strings.TrimSpace(input.Title)
+	input.Description = strings.TrimSpace(input.Description)
+
+	if input.Title == "" {
+		return UpdatePereodicInput{}, fmt.Errorf("%w: title is required", ErrInvalidInput)
+	}
+
+	if input.ID <= 0 {
+		return UpdatePereodicInput{}, fmt.Errorf("%w: id must be positive", ErrInvalidInput)
+	}
+
+	if !input.Status.Valid() {
+		return UpdatePereodicInput{}, fmt.Errorf("%w: invalid status", ErrInvalidInput)
+	}
+
+	return input, nil
+}
+
 // other //////////////////////////////////////////////////////////////////////////
 func validateUpdateInput(input UpdateInput) (UpdateInput, error) {
 	input.Title = strings.TrimSpace(input.Title)

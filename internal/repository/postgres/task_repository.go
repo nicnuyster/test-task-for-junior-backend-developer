@@ -143,6 +143,46 @@ func (r *Repository) CreatePereodic(ctx context.Context, task *taskdomain.Task) 
 	return created, nil
 }
 
+func (r *Repository) DeletePereodic(ctx context.Context, id int64) error {
+	const query = `
+	DELETE FROM tasks WHERE id >= $1 AND title = (SELECT title FROM tasks WHERE id = $1)`
+
+	result, err := r.pool.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return taskdomain.ErrNotFound
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdatePereodic(ctx context.Context, task *taskdomain.Task) (*taskdomain.Task, error) {
+	const query = `
+		UPDATE tasks
+		SET title = $1,
+			description = $2,
+			status = $3,
+			updated_at = $4
+		WHERE id >= $5 AND title = (SELECT title FROM tasks WHERE id = $5)
+		RETURNING id, title, description, status, created_at, updated_at
+	`
+
+	row := r.pool.QueryRow(ctx, query, task.Title, task.Description, task.Status, task.UpdatedAt, task.ID)
+	updated, err := scanTask(row)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, taskdomain.ErrNotFound
+		}
+
+		return nil, err
+	}
+
+	return updated, nil
+}
+
 ///
 
 type taskScanner interface {
