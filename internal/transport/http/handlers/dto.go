@@ -12,6 +12,18 @@ type taskMutationDTO struct {
 	Status      taskdomain.Status `json:"status"`
 }
 
+type taskMutationPereodicUpdateDTO struct {
+	Title       string            `json:"title"`
+	Description string            `json:"description"`
+	Status      taskdomain.Status `json:"status"`
+
+	ID int64 `json:"id"`
+}
+
+type taskMutationPereodicDeleteDTO struct {
+	ID int64 `json:"id"`
+}
+
 type taskMutationPereodicDTO struct {
 	Title       string            `json:"title"`
 	Description string            `json:"description"`

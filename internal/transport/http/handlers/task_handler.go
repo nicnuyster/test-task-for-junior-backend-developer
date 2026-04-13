@@ -142,13 +142,22 @@ func (h *TaskHandler) CreatePereodic(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TaskHandler) DeletePereodic(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromRequest(r)
-	if err != nil {
+	// id, err := getIDFromRequest(r)
+	// if err != nil {
+	// 	writeError(w, http.StatusBadRequest, err)
+	// 	return
+	// }
+
+	var req taskMutationPereodicDeleteDTO
+	if err := decodeJSON(r, &req); err != nil {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if err := h.usecase.Delete(r.Context(), id); err != nil {
+	err := h.usecase.DeletePereodic(r.Context(), taskusecase.DeletePereodicInput{
+		ID: req.ID,
+	})
+	if err != nil {
 		writeUsecaseError(w, err)
 		return
 	}
@@ -157,22 +166,24 @@ func (h *TaskHandler) DeletePereodic(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TaskHandler) UpdatePereodic(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromRequest(r)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, err)
-		return
-	}
+	// //id, err := getIDFromRequest(r)
+	// if err != nil {
+	// 	writeError(w, http.StatusBadRequest, err)
+	// 	return
+	// }
 
-	var req taskMutationDTO
+	var req taskMutationPereodicUpdateDTO
 	if err := decodeJSON(r, &req); err != nil {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	updated, err := h.usecase.Update(r.Context(), id, taskusecase.UpdateInput{
+	updated, err := h.usecase.UpdatePereodic(r.Context(), taskusecase.UpdatePereodicInput{
 		Title:       req.Title,
 		Description: req.Description,
 		Status:      req.Status,
+		//
+		ID: req.ID,
 	})
 	if err != nil {
 		writeUsecaseError(w, err)

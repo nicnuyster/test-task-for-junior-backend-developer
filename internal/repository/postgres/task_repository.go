@@ -144,7 +144,8 @@ func (r *Repository) CreatePereodic(ctx context.Context, task *taskdomain.Task) 
 }
 
 func (r *Repository) DeletePereodic(ctx context.Context, id int64) error {
-	const query = `DELETE FROM tasks WHERE id >= $1 AND title`
+	const query = `
+	DELETE FROM tasks WHERE id >= $1 AND title = (SELECT title FROM tasks WHERE id = $1)`
 
 	result, err := r.pool.Exec(ctx, query, id)
 	if err != nil {
@@ -165,7 +166,7 @@ func (r *Repository) UpdatePereodic(ctx context.Context, task *taskdomain.Task) 
 			description = $2,
 			status = $3,
 			updated_at = $4
-		WHERE id = $5
+		WHERE id >= $5 AND title = (SELECT title FROM tasks WHERE id = $5)
 		RETURNING id, title, description, status, created_at, updated_at
 	`
 

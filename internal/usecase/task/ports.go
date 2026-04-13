@@ -11,6 +11,8 @@ type Repository interface {
 	Create(ctx context.Context, task *taskdomain.Task) (*taskdomain.Task, error)
 	// новое
 	CreatePereodic(ctx context.Context, task *taskdomain.Task) (*taskdomain.Task, error)
+	UpdatePereodic(ctx context.Context, input *taskdomain.Task) (*taskdomain.Task, error)
+	DeletePereodic(ctx context.Context, id int64) error
 	//
 	GetByID(ctx context.Context, id int64) (*taskdomain.Task, error)
 	Update(ctx context.Context, task *taskdomain.Task) (*taskdomain.Task, error)
@@ -27,8 +29,8 @@ type Usecase interface {
 	List(ctx context.Context) ([]taskdomain.Task, error)
 	// нвоое
 	CreatePereodic(ctx context.Context, input CreatePereodicInput) (*taskdomain.Task, error)
-	// UpdatePereodic(ctx context.Context, id int64, input CreatePereodicInput) (*taskdomain.Task, error)
-	// DeletePereodic(ctx context.Context, id int64) error
+	UpdatePereodic(ctx context.Context, input UpdatePereodicInput) (*taskdomain.Task, error)
+	DeletePereodic(ctx context.Context, input DeletePereodicInput) error
 }
 
 type CreateInput struct {
@@ -45,13 +47,6 @@ type UpdateInput struct {
 
 ///
 
-type UpdatePereodicInput struct {
-	Title       string
-	Description string
-	// обновляем ток описание + заголовок
-	//Status      taskdomain.Status
-}
-
 type CreatePereodicInput struct {
 	Title       string
 	Description string
@@ -61,4 +56,16 @@ type CreatePereodicInput struct {
 	RecurrType taskdomain.Recurr
 	DayAmount  int
 	StartDate  time.Time
+}
+
+type UpdatePereodicInput struct {
+	Title       string
+	Description string
+	Status      taskdomain.Status
+	//	дополнено
+	ID int64
+}
+
+type DeletePereodicInput struct {
+	ID int64
 }
